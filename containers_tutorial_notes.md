@@ -101,23 +101,80 @@ kubectl port-forward svc/wordpress 8081:80 &
 open http://localhost:8081
 ```
 
+[Service Types](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
+
 ```shell
 kubectl delete -k ./
+kustomize build . > kustomize_output.yaml
+```
+
+* Deploying automatically with ArgoCD
+
+```shell
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl port-forward svc/argocd-server -n argocd 8080:443 &
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode && echo
+open https://localhost:8080
+```
+
+```shell
+kubectl apply -f ./argocd_application.yaml
 ```
 
 * Resiliency with cross zone deployment & Taints and Tolerations
+
+[Taints and Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+[Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+[topologySpreadConstraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
+
+```shell
+kubectl get nodes --show-labels
+```
+
+`topology.kubernetes.io/zone` label in OpenShift clusters
+
 * Allowing for app movement & node upgrades (PodDisruptionBudget)
-* Deploying automatically with ArgoCD
 
-???
+[Voluntary and involuntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions)
 
-* dashboard proxy
-* NetworkPolicy
+Example PDB:
+
+```yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: myservice-pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: myservice
+```
+
+* Kubernetes Dashboard
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+kubectl proxy &
+open http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+```
+
+```shell
+kubectl apply -f ./user.yaml
+kubectl -n kubernetes-dashboard create token admin-user
+```
+
+* Other tools
+
+[Kubernetes CLI To Manage Your Clusters In Style](https://k9scli.io/)
+[kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
 
 ## Out of Scope
 
 * CI - e.g. https://docs.openshift.com/container-platform/4.14/cicd/jenkins/migrating-from-jenkins-to-openshift-pipelines.html
 * Jobs (e.g. db migrates)
+* NetworkPolicy
 
 ## Relevant Courses
 
@@ -134,14 +191,9 @@ From https://www.linkedin.com/learning
 
 * Learning Kubernetes - https://www.linkedin.com/learning/learning-kubernetes-16086900?u=2056732
 
-
 ## References
 
 * https://kind.sigs.k8s.io/docs/user/ingress/#ingress-nginx
 * https://kubernetes.io/docs/tutorials/stateless-application/guestbook/
 * https://kubernetes.io/docs/tutorials/configuration/configure-redis-using-configmap/
-* 
-
-
-
-
+* https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/

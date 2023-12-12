@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: example-application
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/david-martin/containers-tutorial.git
+    targetRevision: HEAD
+    path: .
+    kustomize:
+      # Specify additional kustomize options here if needed
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
+    # You can also define sync options, retry strategies, etc.
