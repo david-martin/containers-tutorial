@@ -21,14 +21,16 @@ docker stop quickstart
 cd ../../../..
 kind create cluster --config ./cluster.yaml
 kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/kubernetes-engine-samples/ddf42a2821e3542b6d26b4878d0e6014cd638d35/quickstarts/guestbook/all-in-one/guestbook-all-in-one.yaml
+kubectl scale deployment frontend --replicas=1
 kubectl get deployment,pod
+kubectl logs -f $(kubectl get po -l app=guestbook -o name) &
 ```
 
 * Accessing the container (Services, Ingress)
 
 ```shell
-kubectl port-forward svc/frontend 8080:80
-curl http://localhost:8080
+kubectl port-forward svc/frontend 8080:80 &
+open http://localhost:8080
 ```
 
 ```shell
@@ -38,31 +40,71 @@ kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.
 
 ```shell
 kubectl apply -f ./ingress.yaml
+kubectl get ingress example-ingress -o yaml
 ```
 
 ```shell
-curl http://localhost
+open http://localhost
 ```
 
 * Setting Resources & QoS class
 
+[Pod Quality of Service Classes](https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/)
+
 ```shell
-TODO
+kubectl get deployment frontend -n default -o jsonpath="{.spec.template.spec.containers[*].resources}"
 ```
 
 * Scaling up manually & automatically (ReplicaSet, HorizontalPodAutoscaler)
 
 ```shell
-kubectl scale deployment frontend --replicas=2
 kubectl get po
+kubectl scale deployment frontend --replicas=2
+kubectl get po -w
 ```
 
 ```shell
-TODO: HorizontalPodAutoscaler
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--kubelet-insecure-tls"}]'
+kubectl top node
+kubectl top pod -n default -l 'app=guestbook,tier=frontend'
+kubectl autoscale deployment frontend --cpu-percent=50 --min=1 --max=10 -n default
+kubectl get hpa frontend -n default
 ```
 
 * Configuring via env vars (Secrets, ConfigMaps)
+
+```shell
+kubectl exec -it $(kubectl get po -l role=leader,app=redis -o name) -- redis-cli
+CONFIG GET maxmemory
+CONFIG GET maxmemory-policy
+```
+
+```shell
+kubectl apply -f ./redis_config.yaml
+kubectl patch deployment redis-leader -n default --type=json --patch-file=redis_patch.json
+```
+
+[Define container environment variables using ConfigMap data](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#define-container-environment-variables-using-configmap-data)
+[Using Secrets as environment variables](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables)
+
 * Connecting to a Database & Storage (PersistentVolume(Claim))
+
+[Kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/#usage)
+
+```shell
+kubectl apply -k ./
+kubectl get deployment wordpress -o yaml
+kubectl get pvc -n default
+kubectl get pv
+kubectl port-forward svc/wordpress 8081:80 &
+open http://localhost:8081
+```
+
+```shell
+kubectl delete -k ./
+```
+
 * Resiliency with cross zone deployment & Taints and Tolerations
 * Allowing for app movement & node upgrades (PodDisruptionBudget)
 * Deploying automatically with ArgoCD
@@ -97,6 +139,7 @@ From https://www.linkedin.com/learning
 
 * https://kind.sigs.k8s.io/docs/user/ingress/#ingress-nginx
 * https://kubernetes.io/docs/tutorials/stateless-application/guestbook/
+* https://kubernetes.io/docs/tutorials/configuration/configure-redis-using-configmap/
 * 
 
 

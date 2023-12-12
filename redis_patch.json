@@ -1,0 +1,31 @@
+[
+  {
+    "op": "add",
+    "path": "/spec/template/spec/containers/0/command",
+    "value": ["redis-server", "/redis-master/redis.conf"]
+  },
+  {
+    "op": "add",
+    "path": "/spec/template/spec/containers/0/volumeMounts",
+    "value": [
+      {"mountPath": "/redis-master-data", "name": "data"},
+      {"mountPath": "/redis-master", "name": "config"}
+    ]
+  },
+  {
+    "op": "add",
+    "path": "/spec/template/spec/volumes",
+    "value": [
+      {"name": "data", "emptyDir": {}},
+      {
+        "name": "config",
+        "configMap": {
+          "name": "example-redis-config",
+          "items": [
+            {"key": "redis-config", "path": "redis.conf"}
+          ]
+        }
+      }
+    ]
+  }
+]
