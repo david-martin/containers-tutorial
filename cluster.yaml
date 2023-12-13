@@ -16,16 +16,4 @@ nodes:
     hostPort: 443
     protocol: TCP
 - role: worker
-  kubeadmConfigPatches:
-  - |
-    kind: InitConfiguration
-    nodeRegistration:
-      kubeletExtraArgs:
-        node-labels: "topology.kubernetes.io/zone=zone2"
 - role: worker
-  kubeadmConfigPatches:
-  - |
-    kind: InitConfiguration
-    nodeRegistration:
-      kubeletExtraArgs:
-        node-labels: "topology.kubernetes.io/zone=zone3"
