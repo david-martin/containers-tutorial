@@ -1,5 +1,7 @@
 # Containers Tutorial
 
+---
+
 ## Building an image from a Dockerfile, Running a container locally with docker/podman
 
 ```shell
@@ -14,6 +16,8 @@ docker ps
 docker stop quickstart
 ```
 
+---
+
 ## Running a container in kubernetes (Deployments, Pods)
 
 ```shell
@@ -24,6 +28,8 @@ kubectl scale deployment frontend --replicas=1
 kubectl get deployment,pod
 kubectl logs -f $(kubectl get po -l app=guestbook -o name) &
 ```
+
+---
 
 ## Accessing the container (Services, Ingress)
 
@@ -49,6 +55,8 @@ kubectl get ingress example-ingress -o yaml
 open http://localhost
 ```
 
+---
+
 ## Setting Resources & QoS class
 
 * [Pod Quality of Service Classes](https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/)
@@ -56,6 +64,8 @@ open http://localhost
 ```shell
 kubectl get deployment frontend -n default -o jsonpath="{.spec.template.spec.containers[*].resources}"
 ```
+
+---
 
 ## Scaling up manually & automatically (ReplicaSet, HorizontalPodAutoscaler)
 
@@ -73,6 +83,8 @@ kubectl top pod -n default -l 'app=guestbook,tier=frontend'
 kubectl autoscale deployment frontend --cpu-percent=50 --min=1 --max=10 -n default
 kubectl get hpa frontend -n default
 ```
+
+---
 
 ## Configuring via env vars (Secrets, ConfigMaps)
 
@@ -96,6 +108,8 @@ CONFIG GET maxmemory-policy
 * [Define container environment variables using ConfigMap data](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#define-container-environment-variables-using-configmap-data)
 * [Using Secrets as environment variables](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables)
 
+---
+
 ## Connecting to a Database & Storage (PersistentVolume(Claim))
 
 * [Kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/#usage)
@@ -115,6 +129,8 @@ kubectl delete -k ./
 kustomize build . > kustomize_output.yaml
 ```
 
+---
+
 ## Deploying automatically with ArgoCD
 
 ```shell
@@ -129,6 +145,8 @@ open https://localhost:8080
 ```shell
 kubectl apply -f ./argocd_application.yaml
 ```
+
+---
 
 ## Resiliency with cross zone deployment & Taints and Tolerations
 
@@ -153,6 +171,8 @@ kubectl get pods -l app=guestbook,tier=frontend -o custom-columns=NAME:.metadata
 kubectl get DaemonSet/kindnet -n kube-system
 ```
 
+---
+
 ## Allowing for app movement & node upgrades (PodDisruptionBudget)
 
 * [Voluntary and involuntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions)
@@ -173,6 +193,8 @@ spec:
       tier: frontend
 ```
 
+---
+
 ## Kubernetes Dashboard
 
 ```shell
@@ -186,16 +208,22 @@ kubectl apply -f ./user.yaml
 kubectl -n kubernetes-dashboard create token admin-user
 ```
 
+---
+
 ## Other tools
 
 * [Kubernetes CLI To Manage Your Clusters In Style](https://k9scli.io/)
 * [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
 
-## Out of Scope
+---
+
+## Other interesting things
 
 * CI - e.g. https://docs.openshift.com/container-platform/4.14/cicd/jenkins/migrating-from-jenkins-to-openshift-pipelines.html
-* Jobs (e.g. db migrates)
-* NetworkPolicy
+* Jobs (e.g. db migrates) - https://kubernetes.io/docs/concepts/workloads/controllers/job/
+* NetworkPolicy - https://kubernetes.io/docs/concepts/services-networking/network-policies/
+
+---
 
 ## Relevant Courses
 
@@ -211,6 +239,8 @@ NOTE: Some courses may have a cost associated with them.
 From https://www.linkedin.com/learning
 
 * Learning Kubernetes - https://www.linkedin.com/learning/learning-kubernetes-16086900?u=2056732
+
+---
 
 ## References
 
