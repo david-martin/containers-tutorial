@@ -1,7 +1,6 @@
 # Containers Tutorial
 
-* Building an image from a Dockerfile
-* Running a container locally with docker/podman
+## Building an image from a Dockerfile, Running a container locally with docker/podman
 
 ```shell
 git clone git@github.com:GoogleCloudPlatform/kubernetes-engine-samples.git
@@ -15,7 +14,7 @@ docker ps
 docker stop quickstart
 ```
 
-* Running a container in kubernetes (Deployments, Pods)
+## Running a container in kubernetes (Deployments, Pods)
 
 ```shell
 cd ../../../..
@@ -26,10 +25,10 @@ kubectl get deployment,pod
 kubectl logs -f $(kubectl get po -l app=guestbook -o name) &
 ```
 
-* Accessing the container (Services, Ingress)
+## Accessing the container (Services, Ingress)
 
-[Service Types](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
-[Ingress Controllers](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
+* [Service Types](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
+* [Ingress Controllers](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
 
 ```shell
 kubectl port-forward svc/frontend 8080:80 &
@@ -50,15 +49,15 @@ kubectl get ingress example-ingress -o yaml
 open http://localhost
 ```
 
-* Setting Resources & QoS class
+## Setting Resources & QoS class
 
-[Pod Quality of Service Classes](https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/)
+* [Pod Quality of Service Classes](https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/)
 
 ```shell
 kubectl get deployment frontend -n default -o jsonpath="{.spec.template.spec.containers[*].resources}"
 ```
 
-* Scaling up manually & automatically (ReplicaSet, HorizontalPodAutoscaler)
+## Scaling up manually & automatically (ReplicaSet, HorizontalPodAutoscaler)
 
 ```shell
 kubectl get po
@@ -75,7 +74,7 @@ kubectl autoscale deployment frontend --cpu-percent=50 --min=1 --max=10 -n defau
 kubectl get hpa frontend -n default
 ```
 
-* Configuring via env vars (Secrets, ConfigMaps)
+## Configuring via env vars (Secrets, ConfigMaps)
 
 ```shell
 kubectl exec -it $(kubectl get po -l role=leader,app=redis -o name) -- redis-cli
@@ -94,12 +93,12 @@ CONFIG GET maxmemory
 CONFIG GET maxmemory-policy
 ```
 
-[Define container environment variables using ConfigMap data](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#define-container-environment-variables-using-configmap-data)
-[Using Secrets as environment variables](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables)
+* [Define container environment variables using ConfigMap data](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#define-container-environment-variables-using-configmap-data)
+* [Using Secrets as environment variables](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables)
 
-* Connecting to a Database & Storage (PersistentVolume(Claim))
+## Connecting to a Database & Storage (PersistentVolume(Claim))
 
-[Kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/#usage)
+* [Kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/#usage)
 
 ```shell
 kubectl apply -k ./
@@ -116,7 +115,7 @@ kubectl delete -k ./
 kustomize build . > kustomize_output.yaml
 ```
 
-* Deploying automatically with ArgoCD
+## Deploying automatically with ArgoCD
 
 ```shell
 kubectl create namespace argocd
@@ -131,17 +130,15 @@ open https://localhost:8080
 kubectl apply -f ./argocd_application.yaml
 ```
 
-* Resiliency with cross zone deployment & Taints and Tolerations
+## Resiliency with cross zone deployment & Taints and Tolerations
 
-[Taints and Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-[Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-[topologySpreadConstraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
+* [Taints and Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+* [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+* [topologySpreadConstraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
 
 ```shell
 kubectl get nodes --show-labels
 ```
-
-`topology.kubernetes.io/zone` label
 
 ```shell
 kubectl delete hpa frontend -n default
@@ -150,15 +147,15 @@ kubectl scale deployment frontend --replicas=2
 kubectl get pods -l app=guestbook,tier=frontend -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName -n default
 ```
 
-[DaemonSets - Taints and tolerations](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/#taints-and-tolerations)
+* [DaemonSets - Taints and tolerations](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/#taints-and-tolerations)
 
 ```shell
 kubectl get DaemonSet/kindnet -n kube-system
 ```
 
-* Allowing for app movement & node upgrades (PodDisruptionBudget)
+## Allowing for app movement & node upgrades (PodDisruptionBudget)
 
-[Voluntary and involuntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions)
+* [Voluntary and involuntary disruptions](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#voluntary-and-involuntary-disruptions)
 
 Example PDB:
 
@@ -176,7 +173,7 @@ spec:
       tier: frontend
 ```
 
-* Kubernetes Dashboard
+## Kubernetes Dashboard
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
@@ -189,10 +186,10 @@ kubectl apply -f ./user.yaml
 kubectl -n kubernetes-dashboard create token admin-user
 ```
 
-* Other tools
+## Other tools
 
-[Kubernetes CLI To Manage Your Clusters In Style](https://k9scli.io/)
-[kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
+* [Kubernetes CLI To Manage Your Clusters In Style](https://k9scli.io/)
+* [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
 
 ## Out of Scope
 
