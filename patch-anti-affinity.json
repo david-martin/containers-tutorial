@@ -1,0 +1,30 @@
+[
+    {
+      "op": "add",
+      "path": "/spec/template/spec/affinity",
+      "value": {
+        "podAntiAffinity": {
+          "requiredDuringSchedulingIgnoredDuringExecution": [
+            {
+              "labelSelector": {
+                "matchExpressions": [
+                  {
+                    "key": "app",
+                    "operator": "In",
+                    "values": ["guestbook"]
+                  },
+                  {
+                    "key": "tier",
+                    "operator": "In",
+                    "values": ["frontend"]
+                  }
+                ]
+              },
+              "topologyKey": "topology.kubernetes.io/zone"
+            }
+          ]
+        }
+      }
+    }
+  ]
+  

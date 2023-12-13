@@ -28,6 +28,9 @@ kubectl logs -f $(kubectl get po -l app=guestbook -o name) &
 
 * Accessing the container (Services, Ingress)
 
+[Service Types](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
+[Ingress Controllers](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
+
 ```shell
 kubectl port-forward svc/frontend 8080:80 &
 open http://localhost:8080
@@ -85,6 +88,12 @@ kubectl apply -f ./redis_config.yaml
 kubectl patch deployment redis-leader -n default --type=json --patch-file=redis_patch.json
 ```
 
+```shell
+kubectl exec -it $(kubectl get po -l role=leader,app=redis -o name) -- redis-cli
+CONFIG GET maxmemory
+CONFIG GET maxmemory-policy
+```
+
 [Define container environment variables using ConfigMap data](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#define-container-environment-variables-using-configmap-data)
 [Using Secrets as environment variables](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables)
 
@@ -97,11 +106,10 @@ kubectl apply -k ./
 kubectl get deployment wordpress -o yaml
 kubectl get pvc -n default
 kubectl get pv
+docker exec -it kind-worker bash
 kubectl port-forward svc/wordpress 8081:80 &
 open http://localhost:8081
 ```
-
-[Service Types](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
 
 ```shell
 kubectl delete -k ./
@@ -113,6 +121,7 @@ kustomize build . > kustomize_output.yaml
 ```shell
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl wait --namespace argocd --for=condition=ready pod --selector=app.kubernetes.io/name=argocd-server --timeout=90s
 kubectl port-forward svc/argocd-server -n argocd 8080:443 &
 kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode && echo
 open https://localhost:8080
@@ -132,7 +141,20 @@ kubectl apply -f ./argocd_application.yaml
 kubectl get nodes --show-labels
 ```
 
-`topology.kubernetes.io/zone` label in OpenShift clusters
+`topology.kubernetes.io/zone` label
+
+```shell
+kubectl delete hpa frontend -n default
+kubectl patch deployment frontend -n default --type=json --patch-file=patch-anti-affinity.json
+kubectl scale deployment frontend --replicas=2
+kubectl get pods -l app=guestbook,tier=frontend -o custom-columns=NAME:.metadata.name,NODE:.spec.nodeName -n default
+```
+
+[DaemonSets - Taints and tolerations](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/#taints-and-tolerations)
+
+```shell
+kubectl get DaemonSet/kindnet -n kube-system
+```
 
 * Allowing for app movement & node upgrades (PodDisruptionBudget)
 
@@ -144,12 +166,14 @@ Example PDB:
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: myservice-pdb
+  name: frontend-pdb
+  namespace: default
 spec:
-  minAvailable: 2
+  minAvailable: 2  # or use "maxUnavailable: 1"
   selector:
     matchLabels:
-      app: myservice
+      app: guestbook
+      tier: frontend
 ```
 
 * Kubernetes Dashboard
