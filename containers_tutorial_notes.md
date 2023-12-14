@@ -7,7 +7,7 @@
 First, clone a repository containing Dockerfile and application code:
 
 ```shell
-git clone git@github.com:GoogleCloudPlatform/kubernetes-engine-samples.git
+git clone https://github.com/GoogleCloudPlatform/kubernetes-engine-samples.git
 cd ./kubernetes-engine-samples/quickstarts/languages/python
 ```
 
