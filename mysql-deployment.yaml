@@ -18,6 +18,7 @@ metadata:
   name: mysql-pv-claim
   labels:
     app: wordpress
+    test: value
 spec:
   accessModes:
     - ReadWriteOnce
